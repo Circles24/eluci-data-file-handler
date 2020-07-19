@@ -25,7 +25,7 @@ def file_upload_handler(request):
             plasmalogen_df = main_df[main_df["Accepted Compound ID"].str.lower().str.endswith("plasmalogen",na = False)]
 
             retention_rf_df = main_df
-            retention_rf_df["Retention Time Roundoff (in mins)"] = np.round(main_df["Retention time (min)"])
+            retention_rf_df.insert(2,"Retention Time Roundoff (in mins)",np.round(main_df["Retention time (min)"]))
 
             mean_agg_rf_df = retention_rf_df.groupby("Retention Time Roundoff (in mins)").agg('mean').drop(columns="m/z").drop(columns="Retention time (min)")
 
@@ -37,6 +37,9 @@ def file_upload_handler(request):
             plasmalogen_df.to_csv("{}/{}_plasmalogen_df.csv".format(settings.MEDIA_ROOT,df_id))
             retention_rf_df.to_csv("{}/{}_retention_rf_df.csv".format(settings.MEDIA_ROOT,df_id))
             mean_agg_rf_df.to_csv("{}/{}_mean_agg_rf_df.csv".format(settings.MEDIA_ROOT,df_id))
+
+            # print(main_df,pc_df,lpc_df,plasmalogen_df,retention_rf_df,mean_agg_rf_df)
+            # print(retention_rf_df["Retention Time Roundoff (in mins)"])
 
             data={"df_id":df_id}
 
