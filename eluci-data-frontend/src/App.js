@@ -29,18 +29,28 @@ const App = () => {
 
     if (
       formState.dataFile != null &&
-      formState.dataFile.type === REQUIED_FILE_FORMAT
+      formState.dataFile.type === REQUIED_FILE_FORMAT &&
+      uploadStatus != UPLOADING
     ) {
       const formData = new FormData();
       formData.append("dataFile", formState.dataFile, formState.dataFile.name);
 
       console.log("uploading", formState.dataFile);
 
+      setUploadStatus(UPLOADING);
+
       axios
         .post(`${DJANGO_SERVER_ADDRESS}/${FILE_UPLOAD_ROUTE}`, formData)
         .then((res) => {
-          setUploadStatus(UPLOADED);
-          setFormState((prevState) => ({ ...prevState, dfID: res.data.df_id }));
+          if (res.data.df_id != undefined) {
+            setUploadStatus(UPLOADED);
+            setFormState((prevState) => ({
+              ...prevState,
+              dfID: res.data.df_id,
+            }));
+          } else {
+            setUploadStatus(FAILED);
+          }
         })
         .catch((err) => {
           console.error(err);
@@ -102,6 +112,7 @@ const App = () => {
           </div>
         </div>
       )}
+      {uploadStatus == FAILED && <div>last upload failed</div>}
     </div>
   );
 };
